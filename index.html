@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js">
+<!--<![endif]-->
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Corona Virus Tracker</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!--[if lt IE 7]>
+            <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous">
+    </script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous">
+    </script>
+    <script src="https://episphere.github.io/corona/corona.js"></script>
+    <script src="https://unpkg.com/chart.js"></script>
+    <script src="https://unpkg.com/chartjs-chart-geo"></script>
+    <script src="app.js" async defer></script>
+
+    <div class="container-fluid">
+        <h1 class="text-center">Corona Virus Tracker</h1>
+        <h6 class="text-center" id="last_updated"></h6>
+        <div class="row p-5">
+            <!-- Global Infected -->
+            <div class="col">
+                <div class="card text-center text-white bg-warning mb-3">
+                    <img class="rounded img-thumbnail" src="https://image.flaticon.com/icons/svg/2659/2659980.svg"
+                        style="height: 120px;">
+                    <div class="card-body" id="global_infected_card">
+                        <h2 class="card-title"></h2>
+                        <p class="card-text">Total Cases</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Global Recovered -->
+            <div class="col">
+                <div class="card text-center text-center text-white bg-success mb-3">
+                    <img class="rounded img-thumbnail" src="https://image.flaticon.com/icons/svg/1513/1513378.svg"
+                        style="height: 120px;">
+                    <div class="card-body" id="global_recovered_card">
+                        <h2 class="card-title"></h2>
+                        <p class="card-text">Total Recovered</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Global Deaths -->
+            <div class="col">
+
+                <div class="card text-center text-white bg-danger mb-3">
+                    <img class="rounded img-thumbnail" src="https://image.flaticon.com/icons/svg/2487/2487401.svg"
+                        style="height: 120px;">
+                    <div class="card-body" id="global_death_card">
+                        <h2 class="card-title"></h2>
+                        <p class="card-text">Total Deaths</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Global Unresolved -->
+            <!-- <div class="col">
+                <div class="card text-center">
+                    <div class="card-body" id="global_unresolved_card">
+                      <h2 class="card-title"></h2>
+                      <p class="card-text">Total Unresolved</p>
+                    </div>
+                  </div>
+            </div> -->
+        </div>
+        <div class="row p-5">
+            <canvas id="map_chart"></canvas>
+        </div>
+    </div>
+</body>
+
+</html>
