@@ -20,7 +20,7 @@ fetch(topo_url).then(data => data.json()).then((data) => {
     raw_data = data
     // get_nation_totals(data)
     // init_vue_app(data)
-    draw_map(data)
+    // draw_map(data)-
 })
 
 
@@ -106,7 +106,7 @@ function draw_trends(data) {
     }
 
     chart_options = {
-        responsive: false,
+        responsive: true,
         plugins: {
             legend: {
                 display: false
@@ -194,56 +194,136 @@ function draw_trends(data) {
     })
 }
 
-function draw_map(data){
+const STATE_NAMES = {
+    AP: 'Andhra Pradesh',
+    AR: 'Arunachal Pradesh',
+    AS: 'Assam',
+    BR: 'Bihar',
+    CT: 'Chhattisgarh',
+    GA: 'Goa',
+    GJ: 'Gujarat',
+    HR: 'Haryana',
+    HP: 'Himachal Pradesh',
+    JH: 'Jharkhand',
+    KA: 'Karnataka',
+    KL: 'Kerala',
+    MP: 'Madhya Pradesh',
+    MH: 'Maharashtra',
+    MN: 'Manipur',
+    ML: 'Meghalaya',
+    MZ: 'Mizoram',
+    NL: 'Nagaland',
+    OR: 'Odisha',
+    PB: 'Punjab',
+    RJ: 'Rajasthan',
+    SK: 'Sikkim',
+    TN: 'Tamil Nadu',
+    TG: 'Telangana',
+    TR: 'Tripura',
+    UT: 'Uttarakhand',
+    UP: 'Uttar Pradesh',
+    WB: 'West Bengal',
+    AN: 'Andaman and Nicobar Islands',
+    CH: 'Chandigarh',
+    DN: 'Dadra and Nagar Haveli and Daman and Diu',
+    DL: 'Delhi',
+    JK: 'Jammu and Kashmir',
+    LA: 'Ladakh',
+    LD: 'Lakshadweep',
+    PY: 'Puducherry',
+    TT: 'India',
+    // [UNASSIGNED_STATE_CODE]: 'Unassigned',
+}
 
+function draw_map(stat_data) {
 
-    // var ctx = document.getElementById('india_topo')
-    // var deceasedChart = new Chart(ctx, {
-    //     type: 'line',
-    //     data: chart_data2,
-    //     options: chart_options
+    // const svg = d3.select('#india_topo')
+    // .append("svg")
+    // .attr("viewBox", [0, 0, 975, 610]);
+    india_map = []
+    // d3.json('https://www.covid19india.org/mini_maps/india.json', function (india_map) {
+
+    //     var path = d3.geoPath()
+
+    //     svg.append('g')
+    //         .selectAll('path')
+    //         .data(topojson.feature(india_map, india_map.objects.states).features)
+    //         .enter().append("path")
+    //         .attr("d", path)
+
+    //     svg.append("path")
+    //         .datum(topojson.mesh(india_map, india_map.objects.states, function (a, b) {
+    //             return a !== b;
+    //         }))
+    //         .attr("class", "states")
+    //         .attr("d", path)
     // })
 
-    const chart = new Chart(document.getElementById('india_topo').getContext('2d'), {
-        type: 'bubbleMap',
-        data: {
-        //   labels: data.map((d) => d.description),
-          datasets: [
-            {
-              outline: data.objects.states,
-              showOutline: true,
-              backgroundColor: 'steelblue',
-            //   data: data.map((d) => Object.assign(d, { value: Math.round(Math.random() * 10) })),
-            //data: data.objects.states
+    var width = 960,
+        height = 480;
+
+    var svg = d3.select("#india_topo").append("svg")
+        .attr("width", width)
+        .attr("height", height);
+
+    var projection = d3.geo.equirectangular()
+        .scale(153)
+        .translate([width / 2, height / 2])
+        .precision(.1);
+
+    var path = d3.geo.path()
+        .projection(projection);
+
+    d3.json("https://www.covid19india.org/mini_maps/india.json", function (error, topology) {
+        if (error) throw error;
+
+        // svg.append("path")
+        //     .datum(topojson.feature(topology, topology.objects.states))
+        //     .attr("d", path)
+        //     // .attr("d", d3.geo.path().projection(d3.geo.mercator()))
+        //     .attr("class", "land-boundary");
+        svg.append("g")
+            .selectAll("path")
+            .data( topojson.feature(topology, topology.objects.states).features)
+            .enter()
+            .append("path")
+            .attr( "d", path )
+            .attr("class","county"); 
+
+    });
+}
+
+function draw_chartjs_map() {
+    fetch('https://www.covid19india.org/mini_maps/india.json').then((r) => r.json()).then((data) => {
+        const countries = ChartGeo.topojson.feature(data, data.objects.states).features;
+
+        const chart = new Chart(document.getElementById("india_topo").getContext("2d"), {
+            type: 'choropleth',
+            data: {
+                labels: countries.map((d) => d.properties.st_nm),
+                datasets: [{
+                    label: 'Countries',
+                    data: countries.map((d) => ({
+                        feature: d,
+                        // value: Math.random()
+                    })),
+                }]
             },
-          ],
-        },
-        options: {
-          plugins: {
-            legend: {
-              display: false,
-            },
-          },
-          // plugins: {
-          //   datalabels: {
-          //     align: 'top',
-          //     formatter: (v) => {
-          //       return v.description;
-          //     },
-          //   },
-          // },
-          layout: {
-            // padding: 20
-          },
-          scales: {
-            xy: {
-              projection: 'albersUsa',
-            },
-            r: {
-              size: [1, 20],
-              mode: 'area',
-            },
-          },
-        },
-      })
+            options: {
+                showOutline: true,
+                showGraticule: true,
+                legend: {
+                    display: false
+                },
+                scale: {
+                    // projection: 'equalEarth'
+                },
+                geo: {
+                    colorScale: {
+                        display: true,
+                    },
+                },
+            }
+        });
+    });
 }

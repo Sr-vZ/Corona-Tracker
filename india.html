@@ -10,6 +10,13 @@
     <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="//cdn.jsdelivr.net/chartist.js/latest/chartist.min.css">
 </head>
+<style>
+    path {
+        fill: none;
+        stroke: #000;
+        stroke-width: .5px;
+      }
+</style>
 
 <body>
     <header class="text-gray-600 body-font">
@@ -38,7 +45,7 @@
             </button>
         </div>
     </header>
-    <div id="overall_counter" class="container mx-auto px-12">
+    <div id="overall_counter" class="container mx-auto p-12">
         <div class="grid grid-cols-4 gap-6 rounded-md">
             <div class="p-2 align-middle text-center rounded-md border-2 shadow-xl" v-for="os_items in overall_stats">
                 <p class="text-base text-md">{{os_items.title}}</p>
@@ -50,19 +57,29 @@
             </div>
         </div>
     </div>
-    <div class="container">
+    <div class="container mx-auto p-12">
         <div class="flex">
-            <div class="">
-                <canvas id="india_topo"></canvas>
+            <div class="" id="india_topo">
+                <!-- <svg  width="960" height="600"></svg> -->
+                <!-- <canvas id="india_topo" width="800" height="600"></canvas> -->
             </div>
         </div>
         <div class="flex"></div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
     <!-- <script src="//cdn.jsdelivr.net/chartist.js/latest/chartist.min.js"></script> -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/6.6.2/d3.min.js" integrity="sha512-L2eTGYYQqzK5YozYyUVrJKj2ZRnHE3QzV1+1yY6VXHExStF3potRZyEcD/B6sTOe04xYxB21QNLmVTQFcgwovg==" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.7.20/c3.min.js" integrity="sha512-+IpCthlNahOuERYUSnKFjzjdKXIbJ/7Dd6xvUp+7bEw0Jp2dg6tluyxLs+zq9BMzZgrLv8886T4cBSqnKiVgUw==" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.0.1/chart.min.js" integrity="sha512-2uu1jrAmW1A+SMwih5DAPqzFS2PI+OPw79OVLS4NJ6jGHQ/GmIVDDlWwz4KLO8DnoUmYdU8hTtFcp8je6zxbCg==" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/topojson@3"></script>
+    <!-- <script src="https://d3js.org/topojson.v2.min.js"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/6.6.2/d3.min.js"
+        integrity="sha512-L2eTGYYQqzK5YozYyUVrJKj2ZRnHE3QzV1+1yY6VXHExStF3potRZyEcD/B6sTOe04xYxB21QNLmVTQFcgwovg=="
+        crossorigin="anonymous"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.7.20/c3.min.js" integrity="sha512-+IpCthlNahOuERYUSnKFjzjdKXIbJ/7Dd6xvUp+7bEw0Jp2dg6tluyxLs+zq9BMzZgrLv8886T4cBSqnKiVgUw==" crossorigin="anonymous"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.0.1/chart.min.js"
+        integrity="sha512-2uu1jrAmW1A+SMwih5DAPqzFS2PI+OPw79OVLS4NJ6jGHQ/GmIVDDlWwz4KLO8DnoUmYdU8hTtFcp8je6zxbCg=="
+        crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/chartjs-chart-geo"></script>
+    <script src="//d3js.org/d3.v3.min.js"></script>
+    <script src="//d3js.org/topojson.v1.min.js"></script>
     <script src="js/app.js"></script>
 </body>
 
