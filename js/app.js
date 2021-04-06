@@ -1,5 +1,6 @@
 data_url = 'https://api.covid19india.org/v4/min/data.min.json'
 ts_url = 'https://api.covid19india.org/v4/min/timeseries.min.json'
+topo_url = 'https://www.covid19india.org/mini_maps/india.json'
 raw_data = []
 fetch(data_url).then(data => data.json()).then((data) => {
     console.log(data)
@@ -14,6 +15,14 @@ fetch(ts_url).then(data => data.json()).then((data) => {
     // init_vue_app(data)
     draw_trends(data)
 })
+fetch(topo_url).then(data => data.json()).then((data) => {
+    console.log(data)
+    raw_data = data
+    // get_nation_totals(data)
+    // init_vue_app(data)
+    draw_map(data)
+})
+
 
 function get_nation_totals(data) {
     confirmed = 0
@@ -41,78 +50,68 @@ function init_vue_app(data) {
         data: {
             overall_stats: [{
                 title: 'Confirmed cases',
-                delta: data["TT"]['delta'].confirmed,
+                delta: '+' + data["TT"]['delta'].confirmed,
                 total: data['TT']['total'].confirmed,
                 chart_id: 'tt_confirmed_trend'
             }, {
                 title: 'Recovered',
-                delta: data["TT"]['delta'].recovered,
-                total: data['TT']['total'].recovered
+                delta: '+' + data["TT"]['delta'].recovered,
+                total: data['TT']['total'].recovered,
+                chart_id: 'tt_recovered_trend'
             }, {
                 title: 'Deceased',
-                delta: data["TT"]['delta'].deceased,
-                total: data['TT']['total'].deceased
+                delta: '+' + data["TT"]['delta'].deceased,
+                total: data['TT']['total'].deceased,
+                chart_id: 'tt_deceased_trend'
             }, {
                 title: 'Active',
                 delta: "\n",
-                total: data['TT']['total'].confirmed - data['TT']['total'].recovered - data['TT']['total'].deceased
+                total: data['TT']['total'].confirmed - data['TT']['total'].recovered - data['TT']['total'].deceased,
+                chart_id: 'tt_active_trend'
             }]
         }
     })
 }
 
+
+function shorten_data_array(array, skipValue) {
+    temp = []
+    for (i = 0; i < array.length; i++) {
+        if (i % skipValue == 0) {
+            temp.push(array[i])
+        }
+    }
+    return temp
+}
+
 function draw_trends(data) {
     india_data = data['TT']['dates']
     confirmed = []
-    
+    recovered = []
+    deceased = []
+    active = []
+    delta = []
     dates = Object.keys(india_data)
     for (i = 0; i < dates.length; i++) {
         confirmed.push(india_data[dates[i]]['total'].confirmed)
+        recovered.push(india_data[dates[i]]['total'].recovered)
+        deceased.push(india_data[dates[i]]['total'].deceased)
+        active.push(india_data[dates[i]]['total'].active)
+        if (india_data[dates[i]]['delta'].confirmed) {
+            delta.push(india_data[dates[i]]['delta'].confirmed)
+        } else {
+            delta.push(india_data[dates[i]]['delta'].confirmed)
+        }
+        // delta.push(india_data[dates[i]]['delta7'].confirmed)
     }
 
-    // We are setting a few options for our chart and override the defaults
-    var options = {
-        // Don't draw the line chart points
-        showPoint: false,
-        // Disable line smoothing
-        lineSmooth: false,
-        // X-Axis specific configuration
-        axisX: {
-            // We can disable the grid for this axis
-            showGrid: false,
-            // and also don't show the label
-            showLabel: false
-        },
-        // Y-Axis specific configuration
-        axisY: {
-            // Lets offset the chart a bit from the labels
-            // offset: 60,
-            // The label interpolation function enables you to modify the values
-            // used for the labels on each axis. Here we are converting the
-            // values into million pound.
-            // We can disable the grid for this axis
-            showGrid: false,
-            // and also don't show the label
-            showLabel: false,
-            scale: 'log',
-            //   labelInterpolationFnc: function(value) {
-            //     return '$' + value + 'm';
-            //   }
-        }
-    };
-
-    // // Initialize a Line chart in the container with the ID chart1
-    // new Chartist.Line('#tt_confirmed_trend', {
-    // //   labels: [1, 2, 3, 4],
-    //   series: [confirmed]
-    // }, options);
     chart_options = {
         responsive: false,
         plugins: {
             legend: {
                 display: false
             },
-        },        
+        },
         elements: {
             line: {
                 borderColor: '#FF0000',
@@ -125,47 +124,126 @@ function draw_trends(data) {
         tooltips: {
             enabled: false
         },
-        // scales: {
-        //     yAxes: [{
-        //         display: false
-        //     }],
-        //     xAxes: [{
-        //         display: false
-        //     }]
-        // }
         scales: {
             x: {
                 display: false
             },
             y: {
+                // type: 'linear',
                 display: false
             }
         }
     }
+
+    // dates = shorten_data_array(dates, 30)
+    // confirmed = shorten_data_array(confirmed, 30)
+    // recovered = shorten_data_array(recovered, 30)
+    // deceased = shorten_data_array(deceased, 30)
+    // // deceased = shorten_data_array(deceased, 30)
+    // delta = shorten_data_array(delta, 30)
     chart_data = {
         // labels: dates.slice(dates.length-180,dates.length),
         labels: dates,
-        datasets: [{           
+        datasets: [{
             // data: confirmed.slice(dates.length-180,dates.length),
+            // data: confirmed,
             data: confirmed,
             borderColor: 'rgb(75, 192, 192)',
-            //tension: -1
+            //cubicInterpolationMode: 'monotone',
+            tension: 0,
+            // // fill: true,
+            // stepped: true
         }]
     }
-    // chart_data = {
-    //     labels: dates,
-    //     datasets: [{
-    //       label: 'My First Dataset',
-    //       data: confirmed,
-    //       fill: false,
-    //       borderColor: 'rgb(75, 192, 192)',
-    //       //tension: 0.0
-    //     }]
-    //   };
+
+    chart_data1 = {
+        labels: dates,
+        datasets: [{
+            data: recovered,
+            borderColor: 'rgb(75, 192, 192)',
+            tension: 0,
+        }]
+    }
+    chart_data2 = {
+        labels: dates,
+        datasets: [{
+            data: deceased,
+            borderColor: 'rgb(75, 192, 192)',
+            tension: 0,
+        }]
+    }
     var ctx = document.getElementById('tt_confirmed_trend')
-    var myLineChart = new Chart(ctx, {
+    var confimedChart = new Chart(ctx, {
         type: 'line',
         data: chart_data,
         options: chart_options
-    });
+    })
+
+    var ctx = document.getElementById('tt_recovered_trend')
+    var recoveredChart = new Chart(ctx, {
+        type: 'line',
+        data: chart_data1,
+        options: chart_options
+    })
+
+    var ctx = document.getElementById('tt_deceased_trend')
+    var deceasedChart = new Chart(ctx, {
+        type: 'line',
+        data: chart_data2,
+        options: chart_options
+    })
+}
+
+function draw_map(data){
+
+
+    // var ctx = document.getElementById('india_topo')
+    // var deceasedChart = new Chart(ctx, {
+    //     type: 'line',
+    //     data: chart_data2,
+    //     options: chart_options
+    // })
+
+    const chart = new Chart(document.getElementById('india_topo').getContext('2d'), {
+        type: 'bubbleMap',
+        data: {
+        //   labels: data.map((d) => d.description),
+          datasets: [
+            {
+              outline: data.objects.states,
+              showOutline: true,
+              backgroundColor: 'steelblue',
+            //   data: data.map((d) => Object.assign(d, { value: Math.round(Math.random() * 10) })),
+            //data: data.objects.states
+            },
+          ],
+        },
+        options: {
+          plugins: {
+            legend: {
+              display: false,
+            },
+          },
+          // plugins: {
+          //   datalabels: {
+          //     align: 'top',
+          //     formatter: (v) => {
+          //       return v.description;
+          //     },
+          //   },
+          // },
+          layout: {
+            // padding: 20
+          },
+          scales: {
+            xy: {
+              projection: 'albersUsa',
+            },
+            r: {
+              size: [1, 20],
+              mode: 'area',
+            },
+          },
+        },
+      })
 }
