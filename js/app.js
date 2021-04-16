@@ -75,6 +75,33 @@ function init_vue_app(data) {
             }]
         }
     })
+
+    var vue_state_data = []
+    states = Object.keys(data)
+
+    for (i = 0; i < states.length; i++) {
+        if (states[i] != 'TT')
+            vue_state_data.push({
+                name: STATE_NAMES[states[i]],
+                confirmed: data[states[i]]['total'].confirmed,
+                confirmed_delta: data[states[i]]['delta'] ? '+' + data[states[i]]['delta'].confirmed : "",
+                deceased: data[states[i]]['total'].deceased,
+                deceased_delta: data[states[i]]['delta'] ? '+' + data[states[i]]['delta'].deceased : "",
+                active: data[states[i]]['total'].confirmed - data[states[i]]['total'].recovered - data[states[i]]['total'].deceased,
+                recovered: data[states[i]]['total'].recovered,
+                recovered_delta: data[states[i]]['delta'] ? '+' + data[states[i]]['delta'].recovered : "",
+
+            })
+    }
+
+    // console.log('vue data', vue_state_data)
+    var state_data_table = new Vue({
+        el: '#state_data_table',
+        data: {
+            state_data: vue_state_data
+        }
+    })
+
 }
 
 
@@ -265,10 +292,6 @@ function draw_map3(stat_data) {
         if (stat_data[states[i]].hasOwnProperty('districts')) {
             temp_districts = Object.keys(stat_data[states[i]]['districts'])
             for (d = 0; d < temp_districts.length; d++) {
-                // district_wise_dist.push({
-                //     district: temp_districts[d],
-                //     value: stat_data[states[i]]['districts'][temp_districts[d]].total.confirmed
-                // })
                 district_wise_dist[temp_districts[d].toUpperCase()] = {
                     confirmed: stat_data[states[i]]['districts'][temp_districts[d]].total.confirmed,
                     deceased: stat_data[states[i]]['districts'][temp_districts[d]].total.deceased
@@ -318,67 +341,6 @@ function draw_map3(stat_data) {
 
 }
 
-function draw_map2(stat_data) {
-    var width = 600,
-        height = 800;
-    var projection = d3.geo.mercator()
-        .center([-1, 400])
-        .rotate([180, -180])
-        .scale(100)
-        .translate([width / 2, height / 2]);
-
-    var svg = d3.select("#india_topo2").append("svg")
-        .attr("width", width)
-        .attr("height", height);
-
-    var path = d3.geo.path()
-        .projection(projection);
-
-    var g = svg.append("g");
-    d3.json("https://www.covid19india.org/mini_maps/india.json", function (topology) {
-        var features = topojson.feature(topology, topology.objects.states).features;
-        var centroids = features.map(function (feature) {
-            console.log(feature.id)
-            return {
-                coord: path.centroid(feature),
-                // value: stat_data[feature.properties.alias].total.confirmed
-            };
-        })
-        radius = d3.scale.sqrt().domain([0, d3.max(centroids, d => d.value)]).range([0, 50])
-
-        g.selectAll("circle")
-            .data(centroids)
-            .enter()
-            .append("circle")
-            //    .attr("cx", function(d) {
-            //            return projection([d.lon, d.lat])[0];
-            //    })
-            //    .attr("cy", function(d) {
-            //            return projection([d.lon, d.lat])[1];
-            //    })
-            .attr("cx", function (d) {
-                return d['coord'][0];
-            })
-            .attr("cy", function (d) {
-                return d['coord'][1];
-            })
-            .attr("r", function (d) {
-                // return d['value']/1e5;
-                return radius(d['value'])
-            })
-            .style("fill", "red")
-            .style("opacity", .5)
-        // });
-
-        g.selectAll("path")
-            .data(topojson.feature(topology, topology.objects.states)
-                .features)
-            .enter().append("path")
-            .attr("d", path);
-    })
-}
-
-
 function draw_map(stat_data) {
 
     var width = 600,
@@ -399,53 +361,100 @@ function draw_map(stat_data) {
 
     var g = svg.append("g");
 
+    states = Object.keys(stat_data)
+    district_wise_dist = []
+    for (i = 0; i < states.length; i++) {
+        if (stat_data[states[i]].hasOwnProperty('districts')) {
+            temp_districts = Object.keys(stat_data[states[i]]['districts'])
+            for (d = 0; d < temp_districts.length; d++) {
+                district_wise_dist[temp_districts[d].toUpperCase()] = {
+                    confirmed: stat_data[states[i]]['districts'][temp_districts[d]].total.confirmed,
+                    deceased: stat_data[states[i]]['districts'][temp_districts[d]].total.deceased
+                }
+            }
+        }
+    }
+
     // load and display the World
     d3.json("js/ne_10m_admin_1_India_Official.json", function (topology) {
 
+        d3.json("/js/indiaTopoJSON.json", function (topology) {
+            var features = topojson.feature(topology, topology.objects.asasas).features;
+            var centroids = features.map(function (feature) {
+                // console.log(feature.id)
+                return {
+                    coord: path.centroid(feature),
+                    district: feature.properties.DISTRICT,
+                    value: district_wise_dist[feature.properties.DISTRICT] ? district_wise_dist[feature.properties.DISTRICT].confirmed : 0
+                };
+            })
+            console.log(centroids)
+            radius = d3.scale.sqrt().domain([0, d3.max(centroids, d => d.value)]).range([0, 50])
+
+            g.selectAll("circle")
+                .data(centroids)
+                .enter()
+                .append("circle")
+                .attr("cx", function (d) {
+                    return d['coord'][0];
+                })
+                .attr("cy", function (d) {
+                    return d['coord'][1];
+                })
+                .attr("r", function (d) {
+                    // return d['value']/1e5;
+                    return radius(d['value'])
+                })
+                .style("fill", "red")
+                .style("stroke", "darkred")
+                .style("stroke-width", 2)
+                .style("opacity", .3)
+        })
+
         // load and display the cities
         // d3.csv("cities.csv").then(function(data) {
-        console.log(topology)
-        india_map = topology
-        var features = topojson.feature(topology, topology.objects.ne_10m_admin_1_India_Official).features;
-        var centroids = features.map(function (feature) {
-            // console.log(feature.properties.alias)
-            if (feature.properties.alias == "DD") {
-                feature.properties.alias = "DN"
-            }
-            // console.log(stat_data[feature.properties.alias].total.confirmed, path.centroid(feature))
-            // console.log(feature.properties.alias, feature.properties.name)
+        // console.log(topology)
+        // india_map = topology
+        // var features = topojson.feature(topology, topology.objects.ne_10m_admin_1_India_Official).features;
+        // var centroids = features.map(function (feature) {
+        //     // console.log(feature.properties.alias)
+        //     if (feature.properties.alias == "DD") {
+        //         feature.properties.alias = "DN"
+        //     }
+        //     // console.log(stat_data[feature.properties.alias].total.confirmed, path.centroid(feature))
+        //     // console.log(feature.properties.alias, feature.properties.name)
 
-            return {
-                coord: path.centroid(feature),
-                value: stat_data[feature.properties.alias].total.confirmed
-            };
-        })
+        //     return {
+        //         coord: path.centroid(feature),
+        //         value: stat_data[feature.properties.alias].total.confirmed
+        //     };
+        // })
 
         // console.log(centroids)
         // radius = d3.scale.sqrt([0, d3.max(centroids, d => d.value)], [0, 100])
-        radius = d3.scale.sqrt().domain([0, d3.max(centroids, d => d.value)]).range([0, 50])
-        g.selectAll("circle")
-            .data(centroids)
-            .enter()
-            .append("circle")
-            //    .attr("cx", function(d) {
-            //            return projection([d.lon, d.lat])[0];
-            //    })
-            //    .attr("cy", function(d) {
-            //            return projection([d.lon, d.lat])[1];
-            //    })
-            .attr("cx", function (d) {
-                return d['coord'][0];
-            })
-            .attr("cy", function (d) {
-                return d['coord'][1];
-            })
-            .attr("r", function (d) {
-                // return d['value']/1e5;
-                return radius(d['value'])
-            })
-            .style("fill", "red")
-            .style("opacity", .5)
+        // radius = d3.scale.sqrt().domain([0, d3.max(centroids, d => d.value)]).range([0, 50])
+        // g.selectAll("circle")
+        //     .data(centroids)
+        //     .enter()
+        //     .append("circle")
+        //     //    .attr("cx", function(d) {
+        //     //            return projection([d.lon, d.lat])[0];
+        //     //    })
+        //     //    .attr("cy", function(d) {
+        //     //            return projection([d.lon, d.lat])[1];
+        //     //    })
+        //     .attr("cx", function (d) {
+        //         return d['coord'][0];
+        //     })
+        //     .attr("cy", function (d) {
+        //         return d['coord'][1];
+        //     })
+        //     .attr("r", function (d) {
+        //         // return d['value']/1e5;
+        //         return radius(d['value'])
+        //     })
+        //     .style("fill", "red")
+        //     .style("opacity", .5)
         // });
 
         g.selectAll("path")

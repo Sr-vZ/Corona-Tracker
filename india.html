@@ -47,7 +47,7 @@
     </header>
     <div id="overall_counter" class="container mx-auto p-12">
         <div class="grid grid-cols-4 gap-6 rounded-md">
-            <div class="p-2 align-middle text-center rounded-md border-2 shadow-xl" v-for="os_items in overall_stats">
+            <div class="p-2 align-middle text-center rounded-lg border-2 shadow-xl" v-for="os_items in overall_stats">
                 <p class="text-base text-md">{{os_items.title}}</p>
                 <p class="text-base text-xs">{{os_items.delta}}</p>
                 <p class="text-base text-xl font-bold">{{os_items.total}}</p>
@@ -57,16 +57,43 @@
             </div>
         </div>
     </div>
-    <div class="container mx-auto p-12">
+    <div class="flex flex-row mx-auto p-12">
         <div class="flex">
             <div class="" id="india_topo">
                 <!-- <svg  width="960" height="600"></svg> -->
                 <!-- <canvas id="india_topo" width="800" height="600"></canvas> -->
-                
+
             </div>
-            <div class="" id="india_topo2"></div>
+            <!-- <div class="" id="india_topo2"></div> -->
         </div>
-        <div class="flex"></div>
+        <div class="flex border-2 w-full shadow-lg rounded-lg p-4">
+            <table id="state_data_table" class="table-auto w-full">
+                <thead>
+                    <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+                        <td class="word-break">State/UT</td>
+                        <td>Confirmed</td>
+                        <td>Deceased</td>
+                        <td>Active</td>
+                        <td>Recovered</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="state_items in state_data">
+                        <td class="text-bold ">{{state_items.name}}</td>
+                        <td>
+                            <span class="text-xs align-top">{{state_items.confirmed_delta}}</span>
+                            <p class="align-baseline">{{state_items.confirmed}}</p>
+                        </td>
+                        <td>
+                            <span class="text-xs align-top">{{state_items.deceased_delta}}</span>
+                            <p>{{state_items.deceased}}</p>
+                        </td>
+                        <td>{{state_items.active}}</td>
+                        <td>{{state_items.recovered}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
     <!-- <script src="//cdn.jsdelivr.net/chartist.js/latest/chartist.min.js"></script> -->
