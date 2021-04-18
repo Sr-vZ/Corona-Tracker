@@ -84,12 +84,12 @@ function init_vue_app(data) {
             vue_state_data.push({
                 name: STATE_NAMES[states[i]],
                 confirmed: data[states[i]]['total'].confirmed,
-                confirmed_delta: data[states[i]]['delta'] ? '+' + data[states[i]]['delta'].confirmed : "",
+                confirmed_delta: data[states[i]]['delta'] ? data[states[i]]['delta'].confirmed ? '+' + data[states[i]]['delta'].confirmed : "" : "",
                 deceased: data[states[i]]['total'].deceased,
-                deceased_delta: data[states[i]]['delta'] ? '+' + data[states[i]]['delta'].deceased : "",
+                deceased_delta: data[states[i]]['delta'] ? data[states[i]]['delta'].deceased ? '+' + data[states[i]]['delta'].deceased : "" : "",
                 active: data[states[i]]['total'].confirmed - data[states[i]]['total'].recovered - data[states[i]]['total'].deceased,
                 recovered: data[states[i]]['total'].recovered,
-                recovered_delta: data[states[i]]['delta'] ? '+' + data[states[i]]['delta'].recovered : "",
+                recovered_delta: data[states[i]]['delta'] ? data[states[i]]['delta'].recovered ? '+' + data[states[i]]['delta'].recovered : "" : "",
 
             })
     }

@@ -69,8 +69,8 @@
         <div class="flex border-2 w-full shadow-lg rounded-lg p-4">
             <table id="state_data_table" class="table-auto w-full">
                 <thead>
-                    <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
-                        <td class="word-break">State/UT</td>
+                    <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal text-right">
+                        <td class="word-break text-left">State/UT</td>
                         <td>Confirmed</td>
                         <td>Deceased</td>
                         <td>Active</td>
@@ -79,17 +79,22 @@
                 </thead>
                 <tbody>
                     <tr v-for="state_items in state_data">
-                        <td class="text-bold ">{{state_items.name}}</td>
+                        <td class="text-bold text-left">{{state_items.name}}</td>
                         <td>
-                            <span class="text-xs align-top">{{state_items.confirmed_delta}}</span>
-                            <p class="align-baseline">{{state_items.confirmed}}</p>
+                            <p class="text-xs align-top text-right">{{state_items.confirmed_delta}}</p>
+                            <p class="align-baseline text-right">{{state_items.confirmed}}</p>
                         </td>
                         <td>
-                            <span class="text-xs align-top">{{state_items.deceased_delta}}</span>
-                            <p>{{state_items.deceased}}</p>
+                            <p class="text-xs align-top text-right">{{state_items.deceased_delta}}</p>
+                            <p class="align-baseline text-right">{{state_items.deceased}}</p>
                         </td>
-                        <td>{{state_items.active}}</td>
-                        <td>{{state_items.recovered}}</td>
+                        <td>
+                            <p class="align-baseline text-right">{{state_items.active}}</p>
+                        </td>
+                        <td>
+                            <p class="text-xs align-top text-right">{{state_items.recovered_delta}}</p>
+                            <p class="align-baseline text-right">{{state_items.recovered}}</p>
+                        </td>
                     </tr>
                 </tbody>
             </table>
