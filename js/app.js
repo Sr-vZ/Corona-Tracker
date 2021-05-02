@@ -87,10 +87,20 @@ function init_vue_app(data) {
                 confirmed_delta: data[states[i]]['delta'] ? data[states[i]]['delta'].confirmed ? '+' + data[states[i]]['delta'].confirmed : "" : "",
                 deceased: data[states[i]]['total'].deceased,
                 deceased_delta: data[states[i]]['delta'] ? data[states[i]]['delta'].deceased ? '+' + data[states[i]]['delta'].deceased : "" : "",
-                active: data[states[i]]['total'].confirmed - data[states[i]]['total'].recovered - data[states[i]]['total'].deceased,
+                active: (data[states[i]]['total'].confirmed - data[states[i]]['total'].recovered - data[states[i]]['total'].deceased),
+                active_delta: data[states[i]]['delta'] ? isNaN((data[states[i]]['delta'].confirmed - data[states[i]]['delta'].recovered - data[states[i]]['delta'].deceased)) ? "" : '+' + (data[states[i]]['delta'].confirmed - data[states[i]]['delta'].recovered - data[states[i]]['delta'].deceased) : "",
                 recovered: data[states[i]]['total'].recovered,
                 recovered_delta: data[states[i]]['delta'] ? data[states[i]]['delta'].recovered ? '+' + data[states[i]]['delta'].recovered : "" : "",
 
+                // name: STATE_NAMES[states[i]],
+                // confirmed: data[states[i]]['total'].confirmed,
+                // confirmed_delta: data[states[i]]['delta7'] ? data[states[i]]['delta7'].confirmed ? '+' + data[states[i]]['delta7'].confirmed : "" : "",
+                // deceased: data[states[i]]['total'].deceased,
+                // deceased_delta: data[states[i]]['delta7'] ? data[states[i]]['delta7'].deceased ? '+' + data[states[i]]['delta7'].deceased : "" : "",
+                // active: data[states[i]]['total'].confirmed - data[states[i]]['total'].recovered - data[states[i]]['total'].deceased,
+                // active_delta: data[states[i]]['delta7'] ? '+' + (data[states[i]]['delta7'].confirmed - data[states[i]]['delta7'].recovered - data[states[i]]['delta7'].deceased) : "",
+                // recovered: data[states[i]]['total'].recovered,
+                // recovered_delta: data[states[i]]['delta7'] ? data[states[i]]['delta7'].recovered ? '+' + data[states[i]]['delta7'].recovered : "" : "",
             })
     }
 
@@ -127,7 +137,7 @@ function draw_trends(data) {
         confirmed.push(india_data[dates[i]]['total'].confirmed)
         recovered.push(india_data[dates[i]]['total'].recovered)
         deceased.push(india_data[dates[i]]['total'].deceased)
-        active.push(india_data[dates[i]]['total'].active)
+        active.push(india_data[dates[i]]['total'].confirmed - india_data[dates[i]]['total'].deceased - india_data[dates[i]]['total'].recovered)
         if (india_data[dates[i]]['delta'].confirmed) {
             delta.push(india_data[dates[i]]['delta'].confirmed)
         } else {
@@ -179,7 +189,7 @@ function draw_trends(data) {
             // data: confirmed.slice(dates.length-180,dates.length),
             // data: confirmed,
             data: confirmed,
-            borderColor: 'rgb(75, 192, 192)',
+            borderColor: 'rgb(229, 67, 60)',
             //cubicInterpolationMode: 'monotone',
             tension: 0,
             // // fill: true,
@@ -191,7 +201,7 @@ function draw_trends(data) {
         labels: dates,
         datasets: [{
             data: recovered,
-            borderColor: 'rgb(75, 192, 192)',
+            borderColor: 'rgb(97, 217, 124)',
             tension: 0,
         }]
     }
@@ -199,7 +209,15 @@ function draw_trends(data) {
         labels: dates,
         datasets: [{
             data: deceased,
-            borderColor: 'rgb(75, 192, 192)',
+            borderColor: 'rgb(158, 150, 137)',
+            tension: 0,
+        }]
+    }
+    chart_data3 = {
+        labels: dates,
+        datasets: [{
+            data: active,
+            borderColor: 'rgb(51, 162, 255)',
             tension: 0,
         }]
     }
@@ -221,6 +239,13 @@ function draw_trends(data) {
     var deceasedChart = new Chart(ctx, {
         type: 'line',
         data: chart_data2,
+        options: chart_options
+    })
+
+    var ctx = document.getElementById('tt_active_trend')
+    var deceasedChart = new Chart(ctx, {
+        type: 'line',
+        data: chart_data3,
         options: chart_options
     })
 }
@@ -388,7 +413,7 @@ function draw_map(stat_data) {
                     value: district_wise_dist[feature.properties.DISTRICT] ? district_wise_dist[feature.properties.DISTRICT].confirmed : 0
                 };
             })
-            console.log(centroids)
+            //console.log(centroids)
             radius = d3.scale.sqrt().domain([0, d3.max(centroids, d => d.value)]).range([0, 50])
 
             g.selectAll("circle")
